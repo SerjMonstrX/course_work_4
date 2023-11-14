@@ -1,10 +1,13 @@
-from classes.vacancies import HH_API, HH_vacancies
+from classes.vacancies import HH_vacancies
+from classes.jsonhandler import HeadhunterJson
+from classes.api import HH_API
 
 hh_api = HH_API('python')
-hh_data = hh_api.get_requests()
+hh_data = hh_api.get_vacancies()
 
-hh_api.save_to_json(hh_data) #Запись вакансий в файл JSON
-loaded_data = hh_api.load_from_json()
+hh_json = HeadhunterJson()
+hh_json.save_to_json(hh_data) #Запись вакансий в файл JSON
+loaded_data = hh_json.load_from_json()  #Загрузка вакансий из файла JSON
 
 # Пример инициализации объекта Vacancy из первой записи в данных
 
@@ -21,4 +24,4 @@ for vacancy in vacancy_instance:
 # Superjob_response = Superjob('python')
 
 
-# print(Superjob_response.get_requests())
+# print(Superjob_response.get_vacancies())
