@@ -35,6 +35,14 @@ class HH_vacancies:
     def get_requirement(self):
         return self.__requirement
 
+    @highlight_vacancy
+    def display(self):
+        print(f"Название вакансии: {self.__name}")
+        print(f"Зарплата: {self.__salary}")
+        print(f"Ссылка на вакансию: {self.__vacancy_url}")
+        print(f"Требования: {self.__requirement}")
+
+
 class SuperjobVacancies:
 
     def __init__(self, vacancy_data):
@@ -55,7 +63,6 @@ class SuperjobVacancies:
 
     def get_requirement(self):
         return self.__requirement
-
 
     @highlight_vacancy
     def display(self):
