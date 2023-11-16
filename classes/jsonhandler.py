@@ -90,11 +90,13 @@ class SuperjobJson(JsonHandler):
             with open(self.filename, 'r', encoding='utf-8') as file:
                 vacancies_data = json.load(file)
                 # Фильтром удаляем вакансии без указания зарплаты
-                filtered_vacancies_data = [vacancy for vacancy in vacancies_data if vacancy.get('salary', {})
-                                        and isinstance(vacancy['salary'].get('from'), int)]
+                filtered_vacancies_data = [vacancy for vacancy in vacancies_data
+                                        if (vacancy.get('payment_from', {}) and isinstance(vacancy['payment_from'], int))
+                                        or (vacancy.get('payment_to', {}) and isinstance(vacancy['payment_from'], int))
+                                        ]
                 # Сортируем отфильтрованный список вакансий по убыванию зарплаты
                 sorted_vacancies_data = sorted(filtered_vacancies_data,
-                                        key=lambda x: x.get('salary', {}).get('from', float('inf')), reverse=True)
+                                        key=lambda x: x.get('payment_from', {}), reverse=True)
 
             return sorted_vacancies_data
         except (IOError, json.JSONDecodeError) as e:

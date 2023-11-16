@@ -32,7 +32,7 @@ class HeadhunterAPI(JobSitesAPI):
             except json.JSONDecodeError as json_error:
                 print(f"Ошибка декодирования JSON: {json_error}")
                 vacancies_data = []
-
+            print(vacancies_data)
             return vacancies_data
 
         except requests.RequestException as e:
