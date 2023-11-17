@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+import re
 
 
 def highlight_vacancy(func):
@@ -10,22 +10,28 @@ def highlight_vacancy(func):
 
     return wrapper
 
+
 def remove_html_tags(text):
     if text:
-        return BeautifulSoup(text, "html.parser").get_text()
-    return ""
+        clean = re.compile('<.*?>')
+        return re.sub(clean, '', text)
+    else:
+        return ''
+
 
 class HeadhunterVacancies:
 
     def __init__(self, vacancy_data):
         self.__salary = (
-            f"от {'' if not vacancy_data.get('salary', {}).get('from', '') else vacancy_data['salary']['from']}"
-            f"до {'' if not vacancy_data.get('salary', {}).get('to', '') else vacancy_data['salary']['to']} "
+            f"{'от ' if vacancy_data.get('salary') and vacancy_data['salary'].get('from') else ''}"
+            f"{'' if not vacancy_data.get('salary') or not vacancy_data['salary'].get('from') else vacancy_data['salary']['from']}"
+            f"{' до ' if vacancy_data.get('salary') and vacancy_data['salary'].get('to') else ''}"
+            f"{'' if not vacancy_data.get('salary') or not vacancy_data['salary'].get('to') else vacancy_data['salary']['to']} "
             f"{vacancy_data['salary']['currency'] if vacancy_data.get('salary') else ''}"
         )
         self.__name = vacancy_data.get('name', '')
         self.__vacancy_url = vacancy_data.get('alternate_url', '')
-        self.__requirement = vacancy_data.get('snippet', {}).get('requirement', '')
+        self.__requirement = vacancy_data.get('snippet', {}).get('requirement', 'Не указаны, подробнее смотрите описание вакансии на сайте.')
 
     def get_name(self):
         return self.__name
@@ -51,13 +57,21 @@ class SuperjobVacancies:
 
     def __init__(self, vacancy_data):
         self.__salary = (
-            f"от {'' if not vacancy_data.get('payment_from', '') else vacancy_data.get('payment_from', '')}"
-            f"до {'' if not vacancy_data.get('payment_to', '') else vacancy_data.get('payment_to', '')} "
+            f"{'от ' if vacancy_data.get('payment_from', '') else ''}"
+            f"{'' if not vacancy_data.get('payment_from', '') else vacancy_data.get('payment_from', '')}"
+            f"{' до ' if vacancy_data.get('payment_to') else ''}"
+            f"{'' if not vacancy_data.get('payment_to', '') else vacancy_data.get('payment_to', '')} "
             f"{vacancy_data.get('currency', '') if vacancy_data.get('payment_from') else ''}"
         )
         self.__name = vacancy_data.get('profession', '')
         self.__vacancy_url = vacancy_data.get('link', '')
-        self.__requirement = vacancy_data.get('candidat', '')
+        # Извлечение требований
+        description = vacancy_data.get('candidat', '')
+        requirements_match = re.search(r"Требования.*?([\s\S]*?)(?:Условия|$)", description, re.IGNORECASE)
+        if requirements_match:
+            self.__requirement = requirements_match.group(1).strip()
+        else:
+            self.__requirement = 'Не найдены, подробнее смотрите описание вакансии на сайте.'
 
     def get_name(self):
         return self.__name

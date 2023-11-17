@@ -1,8 +1,8 @@
 import json
-import os
 import requests
 from abc import ABC, abstractmethod
 from src.variables import SUPERJOB_API_KEY
+
 
 class JobSitesAPI(ABC):
 
@@ -12,6 +12,7 @@ class JobSitesAPI(ABC):
 
 
 class HeadhunterAPI(JobSitesAPI):
+    """ Класс для работы с API Headhunter """
     def __init__(self, keyword, page=0):
         self.url = "https://api.hh.ru/vacancies"
         self.params = {
@@ -32,7 +33,6 @@ class HeadhunterAPI(JobSitesAPI):
             except json.JSONDecodeError as json_error:
                 print(f"Ошибка декодирования JSON: {json_error}")
                 vacancies_data = []
-            print(vacancies_data)
             return vacancies_data
 
         except requests.RequestException as e:
@@ -40,9 +40,9 @@ class HeadhunterAPI(JobSitesAPI):
             raise RuntimeError(f"Не удалось получить вакансии с HH: {str(e)}")
 
 
-
 class SuperjobAPI(JobSitesAPI):
-    def __init__(self, keywords, page=1):
+    """ Класс для работы с API SuperJob """
+    def __init__(self, keywords, page=0):
         self.url = "https://api.superjob.ru/2.0/vacancies/"
         self.params = {
             "keyword": keywords,
@@ -66,4 +66,3 @@ class SuperjobAPI(JobSitesAPI):
         except requests.RequestException as e:
             print(f'Ошибка {response.status_code}: {response.text}')
             raise RuntimeError(f"Не удалось получить вакансии с Superjob: {str(e)}")
-
